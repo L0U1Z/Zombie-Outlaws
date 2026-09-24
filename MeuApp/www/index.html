@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <meta
+        name="theme-color"
+        content="#17100b"
+    >
+
+    <title>Zombie Outlaws</title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+</head>
+
+<body>
+
+    <!-- =====================================================
+         AVISO PARA GIRAR O CELULAR
+    ====================================================== -->
+
+    <div
+        id="rotate-screen"
+        aria-live="polite"
+    >
+
+        <div class="rotate-box">
+
+            <div class="rotate-icon">
+                ↻
+            </div>
+
+            <h2>
+                Gire o dispositivo
+            </h2>
+
+            <p>
+                Zombie Outlaws deve ser jogado na horizontal.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         JOGO
+    ====================================================== -->
+
+    <main id="game-shell">
+
+
+        <!-- =================================================
+             TELA INICIAL
+        ================================================== -->
+
+        <section
+            id="start-screen"
+            class="screen active"
+        >
+
+            <div class="panel start-panel">
+
+                <p class="eyebrow">
+                    VELHO OESTE • SOBREVIVÊNCIA
+                </p>
+
+                <h1>
+                    Zombie Outlaws
+                </h1>
+
+                <p class="subtitle">
+                    O velho oeste foi tomado pelos mortos.
+                    Pegue seu revólver e sobreviva.
+                </p>
+
+
+                <!-- RECORDE -->
+
+                <div class="record-box">
+
+                    <span>
+                        RECORDE
+                    </span>
+
+                    <strong id="start-high-score">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <button
+                    id="play-btn"
+                    class="primary-btn"
+                >
+                    JOGAR
+                </button>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             TELA DE INSTRUÇÕES
+        ================================================== -->
+
+        <section
+            id="instructions-screen"
+            class="screen"
+        >
+
+            <div class="panel instructions-panel">
+
+                <p class="eyebrow">
+                    ANTES DO DUELO
+                </p>
+
+                <h2>
+                    Como Jogar
+                </h2>
+
+                <p class="subtitle">
+                    Sobreviva às cinco fases,
+                    faça combos e chegue ao confronto final.
+                </p>
+
+
+                <!-- REGRAS -->
+
+                <div class="rules">
+
+
+                    <div class="rule-card">
+
+                        <strong>
+                            Zumbi comum
+                        </strong>
+
+                        <span>
+                            +5 pontos
+                        </span>
+
+                    </div>
+
+
+                    <div class="rule-card">
+
+                        <strong>
+                            Zumbi grande
+                        </strong>
+
+                        <span>
+                            +10 pontos
+                        </span>
+
+                    </div>
+
+
+                    <div class="rule-card">
+
+                        <strong>
+                            Dano recebido
+                        </strong>
+
+                        <span>
+                            -5 pontos
+                        </span>
+
+                    </div>
+
+
+                    <div class="rule-card">
+
+                        <strong>
+                            Vida
+                        </strong>
+
+                        <span>
+                            50 HP
+                        </span>
+
+                    </div>
+
+
+                    <div class="rule-card">
+
+                        <strong>
+                            Revólver
+                        </strong>
+
+                        <span>
+                            10 balas
+                        </span>
+
+                    </div>
+
+
+                    <div class="rule-card">
+
+                        <strong>
+                            Combo
+                        </strong>
+
+                        <span>
+                            elimine rápido para ganhar bônus
+                        </span>
+
+                    </div>
+
+
+                    <div class="rule-card">
+
+                        <strong>
+                            Itens
+                        </strong>
+
+                        <span>
+                            cura, munição e tiro rápido
+                        </span>
+
+                    </div>
+
+
+                    <div class="rule-card">
+
+                        <strong>
+                            Objetivo
+                        </strong>
+
+                        <span>
+                            vença as 5 fases
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- CONTROLES -->
+
+                <div class="controls-help">
+
+                    <p>
+
+                        <strong>
+                            PC:
+                        </strong>
+
+                        WASD ou setas para andar •
+                        mouse para mirar •
+                        clique ou Espaço para atirar •
+                        R para recarregar •
+                        P/Esc para pausar.
+
+                    </p>
+
+
+                    <p>
+
+                        <strong>
+                            Celular:
+                        </strong>
+
+                        use o joystick •
+                        FIRE para atirar no alvo mais próximo •
+                        R para recarregar •
+                        botão de pausa no canto.
+
+                    </p>
+
+                </div>
+
+
+                <button
+                    id="start-game-btn"
+                    class="primary-btn"
+                >
+                    COMEÇAR
+                </button>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             TELA DO JOGO
+        ================================================== -->
+
+        <section
+            id="game-screen"
+            class="screen"
+        >
+
+
+            <!-- =================================================
+                 HUD
+            ================================================== -->
+
+            <div id="hud">
+
+
+                <!-- VIDA -->
+
+                <div class="hud-block">
+
+                    <span class="hud-label">
+                        VIDA
+                    </span>
+
+
+                    <div class="bar-wrap">
+
+                        <div id="health-bar"></div>
+
+                    </div>
+
+
+                    <span id="health-text">
+                        50/50
+                    </span>
+
+                </div>
+
+
+
+                <!-- ESTATÍSTICAS -->
+
+                <div class="hud-block stats">
+
+
+                    <span>
+
+                        FASE
+
+                        <strong id="stage-text">
+                            1/5
+                        </strong>
+
+                    </span>
+
+
+                    <span>
+
+                        PONTOS
+
+                        <strong id="score-text">
+                            0
+                        </strong>
+
+                    </span>
+
+
+                    <span>
+
+                        COMBO
+
+                        <strong id="combo-text">
+                            x1
+                        </strong>
+
+                    </span>
+
+
+                    <span>
+
+                        RECORDE
+
+                        <strong id="high-score-text">
+                            0
+                        </strong>
+
+                    </span>
+
+
+                    <span>
+
+                        ZUMBIS
+
+                        <strong id="zombies-text">
+                            0
+                        </strong>
+
+                    </span>
+
+
+                </div>
+
+
+
+                <!-- MUNIÇÃO -->
+
+                <div class="hud-block ammo">
+
+                    <span class="hud-label">
+                        BALAS
+                    </span>
+
+
+                    <div id="ammo-dots"></div>
+
+
+                    <span id="ammo-text">
+                        10/10
+                    </span>
+
+
+                    <span id="effect-text"></span>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 VIDA DO BOSS
+            ================================================== -->
+
+            <div
+                id="boss-hud"
+                class="hidden"
+            >
+
+                <span>
+                    O COVEIRO
+                </span>
+
+
+                <div class="boss-bar-wrap">
+
+                    <div id="boss-bar"></div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 ÁREA DO JOGO
+            ================================================== -->
+
+            <div id="canvas-wrap">
+
+
+                <canvas id="game-canvas"></canvas>
+
+
+
+                <!-- NOME DA FASE -->
+
+                <div id="stage-banner">
+
+                    <strong id="stage-banner-title">
+                        FASE 1
+                    </strong>
+
+                    <small id="stage-banner-subtitle">
+                        Rua Principal
+                    </small>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     BOTÕES DE SOM E PAUSA
+                ================================================== -->
+
+                <div id="floating-buttons">
+
+
+                    <button
+                        id="sound-btn"
+                        class="mini-btn"
+                        aria-label="Ativar ou desativar som"
+                    >
+                        SOM
+                    </button>
+
+
+                    <button
+                        id="pause-btn"
+                        class="mini-btn"
+                        aria-label="Pausar jogo"
+                    >
+                        II
+                    </button>
+
+
+                </div>
+
+
+
+                <!-- =================================================
+                     CONTROLES MOBILE
+                ================================================== -->
+
+                <div id="mobile-controls">
+
+
+                    <!-- JOYSTICK -->
+
+                    <div
+                        id="joystick"
+                        class="joystick"
+                        aria-label="Controle de movimento"
+                    >
+
+                        <div
+                            id="joystick-knob"
+                            class="joystick-knob"
+                        ></div>
+
+                    </div>
+
+
+
+                    <!-- AÇÕES -->
+
+                    <div class="action-pad">
+
+
+                        <button
+                            id="reload-btn"
+                            class="touch-btn reload-button"
+                        >
+                            R
+                        </button>
+
+
+                        <button
+                            id="shoot-btn"
+                            class="touch-btn fire-button"
+                        >
+                            FIRE
+                        </button>
+
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =================================================
+                     TELA ENTRE FASES
+                ================================================== -->
+
+                <div
+                    id="intermission-overlay"
+                    class="overlay-card hidden"
+                >
+
+                    <p class="eyebrow">
+                        FASE CONCLUÍDA
+                    </p>
+
+
+                    <h2 id="intermission-title">
+                        Rua Principal limpa!
+                    </h2>
+
+
+                    <p id="intermission-text">
+                        Prepare-se para a próxima área.
+                    </p>
+
+
+                    <div class="intermission-stats">
+
+                        <span>
+
+                            Pontos nesta fase
+
+                            <strong id="intermission-score">
+                                0
+                            </strong>
+
+                        </span>
+
+                    </div>
+
+
+                    <button
+                        id="continue-stage-btn"
+                        class="primary-btn"
+                    >
+                        CONTINUAR
+                    </button>
+
+
+                </div>
+
+
+
+                <!-- =================================================
+                     PAUSA
+                ================================================== -->
+
+                <div
+                    id="pause-overlay"
+                    class="overlay-card hidden"
+                >
+
+                    <p class="eyebrow">
+                        JOGO PAUSADO
+                    </p>
+
+
+                    <h2>
+                        Pausa
+                    </h2>
+
+
+                    <button
+                        id="resume-btn"
+                        class="primary-btn"
+                    >
+                        CONTINUAR
+                    </button>
+
+
+                    <button
+                        id="pause-restart-btn"
+                        class="secondary-btn"
+                    >
+                        REINICIAR
+                    </button>
+
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             TELA DE VITÓRIA / DERROTA
+        ================================================== -->
+
+        <section
+            id="end-screen"
+            class="screen"
+        >
+
+            <div class="panel end-panel">
+
+
+                <p
+                    id="end-kicker"
+                    class="eyebrow"
+                >
+                    FIM DE JOGO
+                </p>
+
+
+                <h2 id="end-title">
+                    A horda venceu...
+                </h2>
+
+
+                <p
+                    id="end-message"
+                    class="subtitle"
+                ></p>
+
+
+
+                <!-- RESULTADO -->
+
+                <div class="final-grid">
+
+
+                    <div class="final-score">
+
+                        <span>
+                            Pontuação final
+                        </span>
+
+                        <strong id="final-score-text">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="final-score">
+
+                        <span>
+                            Recorde
+                        </span>
+
+                        <strong id="final-high-score-text">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- CONTINUAR APÓS MORRER -->
+
+                <button
+                    id="continue-life-btn"
+                    class="primary-btn hidden"
+                >
+                    CONTINUAR FASE (1)
+                </button>
+
+
+
+                <!-- REINICIAR -->
+
+                <button
+                    id="restart-btn"
+                    class="secondary-btn"
+                >
+                    JOGAR NOVAMENTE
+                </button>
+
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+    <script src="js/script.js"></script>
+
+
+</body>
+
+</html>
