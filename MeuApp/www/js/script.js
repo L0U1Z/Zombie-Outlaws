@@ -14,6 +14,12 @@
         canvas.getContext("2d");
 
 
+    // Esconde o cursor padrão do mouse sobre o jogo.
+    // A mira personalizada é desenhada diretamente no Canvas.
+    canvas.style.cursor =
+        "none";
+
+
     const screens = {
 
         start:
@@ -192,9 +198,9 @@
                 66,
 
             background: [
-                "#a3663a",
-                "#d19b57",
-                "#633d24"
+                "#d58a50",
+                "#c29352",
+                "#5e351f"
             ],
 
             weights: {
@@ -225,9 +231,9 @@
                 72,
 
             background: [
-                "#7d6a3c",
-                "#b39a54",
-                "#524525"
+                "#8f8150",
+                "#b9a15d",
+                "#4e4529"
             ],
 
             weights: {
@@ -258,9 +264,9 @@
                 78,
 
             background: [
-                "#423833",
-                "#55473e",
-                "#211b18"
+                "#1c1718",
+                "#594638",
+                "#2b201c"
             ],
 
             weights: {
@@ -291,9 +297,9 @@
                 86,
 
             background: [
-                "#9b5531",
-                "#c06f3e",
-                "#603021"
+                "#ce7848",
+                "#d08645",
+                "#633323"
             ],
 
             weights: {
@@ -324,9 +330,9 @@
                 94,
 
             background: [
-                "#382428",
-                "#693b31",
-                "#211719"
+                "#120d18",
+                "#54362f",
+                "#20171c"
             ],
 
             weights: {
@@ -1397,11 +1403,27 @@
             0;
 
 
+        const bounds =
+            getStageBounds(
+                index
+            );
+
+
         player.x =
-            gameWidth() / 2;
+            (
+                bounds.left
+                + bounds.right
+            )
+            / 2;
 
         player.y =
-            gameHeight() / 2;
+            bounds.top
+            +
+            (
+                bounds.bottom
+                - bounds.top
+            )
+            * 0.30;
 
         player.direction =
             1;
@@ -1417,12 +1439,9 @@
 
 
         stageBannerTitle.textContent =
-
             `FASE ${index + 1} — ${info.name}`;
 
-
         stageBannerSubtitle.textContent =
-
             info.subtitle;
 
 
@@ -1439,7 +1458,6 @@
                     .remove("show");
 
             },
-
             1700
         );
 
@@ -1652,49 +1670,218 @@
     // OBSTÁCULOS
     // =========================================================
 
-    function createStageObstacles(stageIndex) {
 
-        obstacles.length =
-            0;
+    // =========================================================
+    // LIMITES JOGÁVEIS DE CADA FASE
+    // =========================================================
 
+    function getStageBounds(
+        stageIndex = state.stage
+    ) {
 
         const w =
             gameWidth();
 
-
         const h =
             gameHeight();
+
+        const bottom =
+            h - 12;
+
+
+        // O valor "top" marca exatamente onde começa o chão.
+        // Tudo acima dele funciona como cenário/parede.
+
+        if (
+            stageIndex === 0
+        ) {
+
+            return {
+                left: 12,
+                right: w - 12,
+                top: h * 0.46,
+                bottom
+            };
+
+        }
+
+
+        if (
+            stageIndex === 1
+        ) {
+
+            return {
+                left: 12,
+                right: w - 12,
+                top: h * 0.44,
+                bottom
+            };
+
+        }
+
+
+        if (
+            stageIndex === 2
+        ) {
+
+            return {
+                left: 12,
+                right: w - 12,
+                top: h * 0.40,
+                bottom
+            };
+
+        }
+
+
+        if (
+            stageIndex === 3
+        ) {
+
+            return {
+                left: w * 0.14,
+                right: w * 0.86,
+                top: h * 0.34,
+                bottom
+            };
+
+        }
+
+
+        return {
+            left: 12,
+            right: w - 12,
+            top: h * 0.43,
+            bottom
+        };
+
+    }
+
+
+    function clampEntityToStage(
+        entity,
+        stageIndex = state.stage,
+        extraMargin = 0
+    ) {
+
+        const bounds =
+            getStageBounds(
+                stageIndex
+            );
+
+        const radius =
+            (entity.radius || 0)
+            +
+            extraMargin;
+
+
+        entity.x =
+            Math.max(
+                bounds.left + radius,
+                Math.min(
+                    bounds.right - radius,
+                    entity.x
+                )
+            );
+
+
+        entity.y =
+            Math.max(
+                bounds.top + radius,
+                Math.min(
+                    bounds.bottom - radius,
+                    entity.y
+                )
+            );
+
+    }
+
+
+    function randomGroundPosition(
+        padding = 50
+    ) {
+
+        const bounds =
+            getStageBounds();
+
+        return {
+            x:
+                bounds.left
+                + padding
+                + Math.random()
+                * Math.max(
+                    20,
+                    bounds.right
+                    - bounds.left
+                    - padding * 2
+                ),
+
+            y:
+                bounds.top
+                + padding
+                + Math.random()
+                * Math.max(
+                    20,
+                    bounds.bottom
+                    - bounds.top
+                    - padding * 2
+                )
+        };
+
+    }
+
+
+    function createStageObstacles(stageIndex) {
+
+        // Impede que obstáculos de uma fase anterior
+        // continuem existindo na próxima.
+        obstacles.length =
+            0;
+
+
+        const bounds =
+            getStageBounds(
+                stageIndex
+            );
+
+        const playableWidth =
+            bounds.right
+            - bounds.left;
+
+        const playableHeight =
+            bounds.bottom
+            - bounds.top;
 
 
         const layouts = [
 
             [
-                [0.18, 0.58, 56, 38],
-                [0.75, 0.56, 62, 42],
-                [0.32, 0.78, 48, 34]
+                [0.16, 0.35, 56, 38],
+                [0.76, 0.38, 62, 42],
+                [0.32, 0.76, 48, 34]
             ],
 
             [
-                [0.18, 0.55, 72, 34],
-                [0.75, 0.67, 72, 34],
+                [0.17, 0.35, 72, 34],
+                [0.76, 0.58, 72, 34],
                 [0.48, 0.82, 66, 30]
             ],
 
             [
-                [0.20, 0.50, 42, 90],
-                [0.80, 0.55, 42, 92],
+                [0.20, 0.44, 42, 90],
+                [0.80, 0.50, 42, 92],
                 [0.50, 0.78, 52, 74]
             ],
 
             [
-                [0.18, 0.62, 72, 58],
-                [0.80, 0.50, 82, 64],
-                [0.50, 0.80, 62, 48]
+                [0.20, 0.50, 72, 58],
+                [0.80, 0.42, 82, 64],
+                [0.50, 0.78, 62, 48]
             ],
 
             [
-                [0.19, 0.57, 86, 42],
-                [0.76, 0.62, 92, 42],
+                [0.19, 0.48, 86, 42],
+                [0.76, 0.56, 92, 42],
                 [0.48, 0.82, 74, 34]
             ]
 
@@ -1714,14 +1901,14 @@
             obstacles.push({
 
                 x:
-                    nx * w
-                    -
-                    width / 2,
+                    bounds.left
+                    + nx * playableWidth
+                    - width / 2,
 
                 y:
-                    ny * h
-                    -
-                    height / 2,
+                    bounds.top
+                    + ny * playableHeight
+                    - height / 2,
 
                 w:
                     width,
@@ -2021,13 +2208,30 @@
 
 
     function randomEdgePosition(
-        margin = 45
+        margin = 24
     ) {
+
+        const bounds =
+            getStageBounds();
+
+
+        // O topo não faz mais parte do sorteio.
+        // Zumbis entram somente pelas laterais ou por baixo,
+        // sempre dentro da região de chão.
 
         const side =
             Math.floor(
-                Math.random() * 4
+                Math.random() * 3
             );
+
+
+        const minY =
+            bounds.top
+            + 30;
+
+        const maxY =
+            bounds.bottom
+            - 30;
 
 
         if (
@@ -2035,15 +2239,17 @@
         ) {
 
             return {
-
                 x:
-                    Math.random()
-                    *
-                    gameWidth(),
+                    bounds.left
+                    + margin,
 
                 y:
-                    -margin
-
+                    minY
+                    + Math.random()
+                    * Math.max(
+                        20,
+                        maxY - minY
+                    )
             };
 
         }
@@ -2054,53 +2260,37 @@
         ) {
 
             return {
-
                 x:
-                    gameWidth()
-                    +
-                    margin,
+                    bounds.right
+                    - margin,
 
                 y:
-                    Math.random()
-                    *
-                    gameHeight()
-
-            };
-
-        }
-
-
-        if (
-            side === 2
-        ) {
-
-            return {
-
-                x:
-                    Math.random()
-                    *
-                    gameWidth(),
-
-                y:
-                    gameHeight()
-                    +
-                    margin
-
+                    minY
+                    + Math.random()
+                    * Math.max(
+                        20,
+                        maxY - minY
+                    )
             };
 
         }
 
 
         return {
-
             x:
-                -margin,
+                bounds.left
+                + 30
+                + Math.random()
+                * Math.max(
+                    20,
+                    bounds.right
+                    - bounds.left
+                    - 60
+                ),
 
             y:
-                Math.random()
-                *
-                gameHeight()
-
+                bounds.bottom
+                - margin
         };
 
     }
@@ -2141,7 +2331,7 @@
                 };
 
 
-        zombies.push({
+        const enemy = {
 
             type,
 
@@ -2179,10 +2369,8 @@
 
             seed:
                 Math.random()
-                *
-                Math.PI
-                *
-                2,
+                * Math.PI
+                * 2,
 
             hitFlashUntil:
                 0,
@@ -2207,7 +2395,18 @@
             chargeUntil:
                 0
 
-        });
+        };
+
+
+        // Mesmo invocações do boss ficam presas ao chão.
+        clampEntityToStage(
+            enemy
+        );
+
+
+        zombies.push(
+            enemy
+        );
 
 
         if (
@@ -2251,16 +2450,24 @@
             0;
 
 
+        const bounds =
+            getStageBounds();
+
+
         const boss = {
 
             type:
                 "boss",
 
             x:
-                gameWidth() / 2,
+                (
+                    bounds.left
+                    + bounds.right
+                )
+                / 2,
 
             y:
-                -60,
+                bounds.top + 72,
 
             radius:
                 42,
@@ -2288,10 +2495,8 @@
 
             seed:
                 Math.random()
-                *
-                Math.PI
-                *
-                2,
+                * Math.PI
+                * 2,
 
             hitFlashUntil:
                 0,
@@ -2310,18 +2515,21 @@
 
             nextSummon:
                 performance.now()
-                +
-                2600,
+                + 2600,
 
             nextCharge:
                 performance.now()
-                +
-                3400,
+                + 3400,
 
             chargeUntil:
                 0
 
         };
+
+
+        clampEntityToStage(
+            boss
+        );
 
 
         zombies.push(
@@ -2359,7 +2567,6 @@
                     .remove("show");
 
             },
-
             2200
         );
 
@@ -3645,6 +3852,11 @@
 
             }
 
+
+            // Garante que uma colisão com caixa/pedra não empurre
+            // o jogador para dentro do cenário de fundo.
+            clampPlayer();
+
         }
 
 
@@ -3963,6 +4175,12 @@
             }
 
 
+            // Knockback também respeita as paredes do mapa.
+            clampEntityToStage(
+                enemy
+            );
+
+
             if (
                 enemy.boss
             ) {
@@ -4134,6 +4352,13 @@
             }
 
 
+            // Zumbis e boss nunca atravessam a parede de fundo
+            // nem as paredes laterais do desfiladeiro.
+            clampEntityToStage(
+                enemy
+            );
+
+
             if (
 
                 circleCollision(
@@ -4191,6 +4416,11 @@
                             ? 34
                             : 22
                     );
+
+
+                clampEntityToStage(
+                    enemy
+                );
 
             }
 
@@ -4483,6 +4713,20 @@
 
         ctx.restore();
 
+
+        // No computador, a mira personalizada substitui o cursor padrão.
+        // Ela é desenhada depois do ctx.restore() para não tremer junto
+        // com o efeito de impacto da câmera.
+        if (
+            !mobilePointer
+            &&
+            pointer.active
+        ) {
+
+            drawGunSight();
+
+        }
+
     }
 
 
@@ -4495,719 +4739,1054 @@
         const width =
             gameWidth();
 
-
         const height =
             gameHeight();
 
+        const bounds =
+            getStageBounds();
 
-        const [
-            sky,
-            ground,
-            dark
-        ] =
-            stages[
-                state.stage
-            ].background;
+        const top =
+            bounds.top;
 
+        const left =
+            bounds.left;
 
-        ctx.fillStyle =
-            sky;
-
-
-        ctx.fillRect(
-
-            0,
-
-            0,
-
-            width,
-
-            height * 0.43
-
-        );
-
-
-        ctx.fillStyle =
-            ground;
-
-
-        ctx.fillRect(
-
-            0,
-
-            height * 0.43,
-
-            width,
-
-            height * 0.57
-
-        );
+        const right =
+            bounds.right;
 
 
         // =====================================================
-        // FASE 1
+        // FASE 1 — RUA PRINCIPAL
         // =====================================================
 
         if (
             state.stage === 0
         ) {
 
-            ctx.fillStyle =
-                dark;
+            const sunset =
+                ctx.createLinearGradient(
+                    0,
+                    0,
+                    0,
+                    top
+                );
 
+            sunset.addColorStop(
+                0,
+                "#d58a50"
+            );
+
+            sunset.addColorStop(
+                0.55,
+                "#a75e39"
+            );
+
+            sunset.addColorStop(
+                1,
+                "#74442d"
+            );
+
+            ctx.fillStyle =
+                sunset;
+
+            ctx.fillRect(
+                0,
+                0,
+                width,
+                top
+            );
+
+
+            // Sol distante.
+            ctx.fillStyle =
+                "rgba(250, 190, 95, 0.65)";
+
+            ctx.beginPath();
+            ctx.arc(
+                width * 0.80,
+                top * 0.24,
+                34,
+                0,
+                Math.PI * 2
+            );
+            ctx.fill();
+
+
+            // Mesas no horizonte.
+            ctx.fillStyle =
+                "#77452e";
+
+            ctx.beginPath();
+            ctx.moveTo(0, top * 0.64);
+            ctx.lineTo(width * 0.11, top * 0.49);
+            ctx.lineTo(width * 0.22, top * 0.63);
+            ctx.lineTo(width * 0.38, top * 0.43);
+            ctx.lineTo(width * 0.54, top * 0.65);
+            ctx.lineTo(width * 0.72, top * 0.47);
+            ctx.lineTo(width * 0.88, top * 0.62);
+            ctx.lineTo(width, top * 0.52);
+            ctx.lineTo(width, top);
+            ctx.lineTo(0, top);
+            ctx.closePath();
+            ctx.fill();
+
+
+            const facades = [
+                "#5e351f",
+                "#6b3d24",
+                "#75462b",
+                "#59321f"
+            ];
 
             for (
-
-                let x = 18;
-
+                let x = 28, i = 0;
                 x < width;
-
-                x += 150
-
+                x += 142, i++
             ) {
 
-                ctx.fillRect(
+                const buildingWidth =
+                    104;
 
+                const buildingHeight =
+                    top * (0.31 + (i % 2) * 0.035);
+
+                const y =
+                    top - buildingHeight;
+
+                ctx.fillStyle =
+                    facades[
+                        i % facades.length
+                    ];
+
+                ctx.fillRect(
                     x,
-
-                    height * 0.26,
-
-                    108,
-
-                    height * 0.17
-
+                    y,
+                    buildingWidth,
+                    buildingHeight
                 );
-
-
-                ctx.fillRect(
-
-                    x + 18,
-
-                    height * 0.22,
-
-                    72,
-
-                    22
-
-                );
-
 
                 ctx.fillStyle =
-                    "#c58d49";
-
+                    "#3f2418";
 
                 ctx.fillRect(
+                    x + 8,
+                    y - 18,
+                    buildingWidth - 16,
+                    18
+                );
 
-                    x + 20,
+                ctx.fillStyle =
+                    "#d09a53";
 
-                    height * 0.31,
+                ctx.fillRect(
+                    x + 14,
+                    y + buildingHeight * 0.36,
+                    16,
+                    26
+                );
 
+                ctx.fillRect(
+                    x + 68,
+                    y + buildingHeight * 0.36,
                     18,
-
-                    28
-
-                );
-
-
-                ctx.fillRect(
-
-                    x + 65,
-
-                    height * 0.31,
-
-                    20,
-
                     20
-
                 );
-
 
                 ctx.fillStyle =
-                    dark;
+                    "#2e1b13";
+
+                ctx.fillRect(
+                    x + 43,
+                    y + buildingHeight * 0.58,
+                    22,
+                    buildingHeight * 0.42
+                );
 
             }
 
 
+            // Chão jogável.
             ctx.fillStyle =
-                "rgba(95, 58, 34, 0.45)";
+                "#c29352";
 
+            ctx.fillRect(
+                0,
+                top,
+                width,
+                height - top
+            );
+
+
+            // Rua central.
+            ctx.fillStyle =
+                "#9f6f3f";
 
             ctx.beginPath();
-
-
-            ctx.moveTo(
-
-                width * 0.38,
-
-                height * 0.43
-
-            );
-
-
-            ctx.lineTo(
-
-                width * 0.62,
-
-                height * 0.43
-
-            );
-
-
-            ctx.lineTo(
-
-                width * 0.9,
-
-                height
-
-            );
-
-
-            ctx.lineTo(
-
-                width * 0.1,
-
-                height
-
-            );
-
-
+            ctx.moveTo(width * 0.41, top);
+            ctx.lineTo(width * 0.59, top);
+            ctx.lineTo(width * 0.88, height);
+            ctx.lineTo(width * 0.12, height);
             ctx.closePath();
-
-
             ctx.fill();
+
+
+            // Pedrinhas / marcas no chão.
+            ctx.fillStyle =
+                "rgba(89, 53, 31, 0.18)";
+
+            for (
+                let x = 70;
+                x < width;
+                x += 130
+            ) {
+                ctx.fillRect(
+                    x,
+                    top + 55 + (x % 3) * 42,
+                    26,
+                    4
+                );
+            }
+
+
+            // Linha visual da parede.
+            ctx.fillStyle =
+                "rgba(50, 28, 18, 0.42)";
+
+            ctx.fillRect(
+                0,
+                top - 4,
+                width,
+                8
+            );
 
         }
 
 
         // =====================================================
-        // FASE 2
+        // FASE 2 — FAZENDA ABANDONADA
         // =====================================================
 
-        if (
+        else if (
             state.stage === 1
         ) {
 
-            ctx.fillStyle =
-                dark;
+            const farmSky =
+                ctx.createLinearGradient(
+                    0,
+                    0,
+                    0,
+                    top
+                );
 
+            farmSky.addColorStop(
+                0,
+                "#8f8150"
+            );
+
+            farmSky.addColorStop(
+                1,
+                "#6b6038"
+            );
+
+            ctx.fillStyle =
+                farmSky;
 
             ctx.fillRect(
-
                 0,
-
-                height * 0.38,
-
+                0,
                 width,
-
-                8
-
+                top
             );
 
 
+            // Milharal distante.
+            ctx.fillStyle =
+                "#667044";
+
             for (
-
-                let x = 12;
-
+                let x = 0;
                 x < width;
-
-                x += 26
-
+                x += 18
             ) {
+                const cornHeight =
+                    26 + (x % 5) * 3;
 
                 ctx.fillRect(
-
                     x,
-
-                    height * 0.31
-                    +
-                    Math.sin(x) * 2,
-
-                    4,
-
-                    48
-
+                    top - cornHeight - 38,
+                    5,
+                    cornHeight
                 );
-
             }
 
 
+            // Cerca que funciona visualmente como a divisão.
+            ctx.fillStyle =
+                "#4e4529";
+
             ctx.fillRect(
-
-                width * 0.72,
-
-                height * 0.24,
-
-                120,
-
-                height * 0.19
-
+                0,
+                top - 38,
+                width,
+                7
             );
 
+            ctx.fillRect(
+                0,
+                top - 12,
+                width,
+                7
+            );
+
+            for (
+                let x = 12;
+                x < width;
+                x += 28
+            ) {
+                ctx.fillRect(
+                    x,
+                    top - 62,
+                    5,
+                    58
+                );
+            }
+
+
+            // Celeiro ao fundo.
+            const barnX =
+                width * 0.73;
+
+            const barnY =
+                top * 0.40;
+
+            const barnW =
+                130;
+
+            const barnH =
+                top * 0.43;
+
+            ctx.fillStyle =
+                "#6a3929";
+
+            ctx.fillRect(
+                barnX,
+                barnY,
+                barnW,
+                barnH
+            );
+
+            ctx.fillStyle =
+                "#42261d";
 
             ctx.beginPath();
-
-
-            ctx.moveTo(
-
-                width * 0.70,
-
-                height * 0.24
-
-            );
-
-
-            ctx.lineTo(
-
-                width * 0.82,
-
-                height * 0.15
-
-            );
-
-
-            ctx.lineTo(
-
-                width * 0.94,
-
-                height * 0.24
-
-            );
-
-
+            ctx.moveTo(barnX - 18, barnY);
+            ctx.lineTo(barnX + barnW / 2, barnY - 62);
+            ctx.lineTo(barnX + barnW + 18, barnY);
+            ctx.closePath();
             ctx.fill();
+
+            ctx.fillStyle =
+                "#35231b";
+
+            ctx.fillRect(
+                barnX + 48,
+                barnY + barnH * 0.42,
+                34,
+                barnH * 0.58
+            );
+
+
+            // Chão jogável.
+            ctx.fillStyle =
+                "#b9a15d";
+
+            ctx.fillRect(
+                0,
+                top,
+                width,
+                height - top
+            );
+
+
+            // Sulcos de plantação / terra seca.
+            ctx.strokeStyle =
+                "rgba(99, 78, 40, 0.22)";
+
+            ctx.lineWidth =
+                3;
+
+            for (
+                let y = top + 42;
+                y < height;
+                y += 68
+            ) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y + 10);
+                ctx.stroke();
+            }
+
+
+            // Pequenas moitas.
+            ctx.fillStyle =
+                "rgba(92, 103, 55, 0.42)";
+
+            for (
+                let x = 90;
+                x < width;
+                x += 210
+            ) {
+                ctx.beginPath();
+                ctx.arc(
+                    x,
+                    top + 70 + (x % 4) * 35,
+                    8,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fill();
+            }
+
+
+            ctx.fillStyle =
+                "rgba(45, 38, 22, 0.38)";
+
+            ctx.fillRect(
+                0,
+                top - 4,
+                width,
+                8
+            );
 
         }
 
 
         // =====================================================
-        // FASE 3
+        // FASE 3 — MINA ASSOMBRADA
         // =====================================================
 
-        if (
+        else if (
             state.stage === 2
         ) {
 
-            ctx.fillStyle =
-                "#171313";
-
-
-            ctx.fillRect(
-
-                0,
-
-                0,
-
-                width,
-
-                height
-
-            );
-
-
-            const gradient =
-
-                ctx.createRadialGradient(
-
-                    width / 2,
-
-                    height * 0.58,
-
-                    20,
-
-                    width / 2,
-
-                    height * 0.58,
-
-                    Math.max(
-                        width,
-                        height
-                    )
-                    *
-                    0.75
-
+            const cave =
+                ctx.createLinearGradient(
+                    0,
+                    0,
+                    0,
+                    height
                 );
 
-
-            gradient.addColorStop(
-
+            cave.addColorStop(
                 0,
-
-                "#75604c"
-
+                "#1c1718"
             );
 
-
-            gradient.addColorStop(
-
+            cave.addColorStop(
                 0.42,
-
-                "#493d34"
-
+                "#40332d"
             );
 
-
-            gradient.addColorStop(
-
+            cave.addColorStop(
                 1,
-
-                "#171313"
-
+                "#604b3c"
             );
-
 
             ctx.fillStyle =
-                gradient;
-
+                cave;
 
             ctx.fillRect(
-
                 0,
-
                 0,
-
                 width,
-
                 height
-
             );
 
 
+            // Teto de rocha irregular.
             ctx.fillStyle =
-                "#241b17";
+                "#171213";
 
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(width, 0);
+            ctx.lineTo(width, top * 0.76);
+            ctx.lineTo(width * 0.88, top * 0.62);
+            ctx.lineTo(width * 0.74, top * 0.78);
+            ctx.lineTo(width * 0.61, top * 0.60);
+            ctx.lineTo(width * 0.47, top * 0.80);
+            ctx.lineTo(width * 0.32, top * 0.62);
+            ctx.lineTo(width * 0.17, top * 0.76);
+            ctx.lineTo(0, top * 0.64);
+            ctx.closePath();
+            ctx.fill();
+
+
+            // Estruturas de madeira no fundo.
+            ctx.fillStyle =
+                "#2b201c";
 
             for (
-
-                let x = 50;
-
+                let x = 75;
                 x < width;
-
-                x += 180
-
+                x += 190
             ) {
-
                 ctx.fillRect(
-
                     x,
-
-                    height * 0.14,
-
-                    16,
-
-                    height * 0.72
-
+                    top * 0.18,
+                    14,
+                    top * 0.82
                 );
-
 
                 ctx.fillRect(
-
-                    x - 35,
-
-                    height * 0.16,
-
-                    86,
-
+                    x - 40,
+                    top * 0.20,
+                    94,
                     12
+                );
+            }
 
+
+            // Lanternas.
+            for (
+                const lx of [
+                    width * 0.24,
+                    width * 0.74
+                ]
+            ) {
+                const glow =
+                    ctx.createRadialGradient(
+                        lx,
+                        top * 0.50,
+                        5,
+                        lx,
+                        top * 0.50,
+                        72
+                    );
+
+                glow.addColorStop(
+                    0,
+                    "rgba(255, 193, 92, 0.38)"
                 );
 
+                glow.addColorStop(
+                    1,
+                    "rgba(255, 193, 92, 0)"
+                );
+
+                ctx.fillStyle =
+                    glow;
+
+                ctx.fillRect(
+                    lx - 80,
+                    top * 0.50 - 80,
+                    160,
+                    160
+                );
+
+                ctx.fillStyle =
+                    "#d4a34f";
+
+                ctx.fillRect(
+                    lx - 5,
+                    top * 0.50 - 7,
+                    10,
+                    14
+                );
             }
+
+
+            // Piso da mina.
+            ctx.fillStyle =
+                "#594638";
+
+            ctx.fillRect(
+                0,
+                top,
+                width,
+                height - top
+            );
+
+
+            // Trilhos decorativos no chão.
+            ctx.fillStyle =
+                "#2c2320";
+
+            ctx.fillRect(
+                0,
+                height * 0.79,
+                width,
+                6
+            );
+
+            ctx.fillRect(
+                0,
+                height * 0.88,
+                width,
+                6
+            );
+
+            for (
+                let x = 0;
+                x < width;
+                x += 44
+            ) {
+                ctx.fillRect(
+                    x,
+                    height * 0.77,
+                    6,
+                    height * 0.14
+                );
+            }
+
+
+            ctx.fillStyle =
+                "rgba(0, 0, 0, 0.42)";
+
+            ctx.fillRect(
+                0,
+                top - 5,
+                width,
+                10
+            );
 
         }
 
 
         // =====================================================
-        // FASE 4
+        // FASE 4 — DESFILADEIRO
         // =====================================================
 
-        if (
+        else if (
             state.stage === 3
         ) {
 
-            ctx.fillStyle =
-                dark;
-
-
-            ctx.fillRect(
-
-                0,
-
-                0,
-
-                width * 0.12,
-
-                height
-
-            );
-
-
-            ctx.fillRect(
-
-                width * 0.88,
-
-                0,
-
-                width * 0.12,
-
-                height
-
-            );
-
-
-            ctx.fillStyle =
-                "rgba(255, 220, 170, 0.08)";
-
-
-            for (
-
-                let y = 30;
-
-                y < height;
-
-                y += 60
-
-            ) {
-
-                ctx.fillRect(
-
+            const canyonSky =
+                ctx.createLinearGradient(
                     0,
-
-                    y,
-
-                    width,
-
-                    2
-
+                    0,
+                    0,
+                    top
                 );
 
-            }
+            canyonSky.addColorStop(
+                0,
+                "#ce7848"
+            );
 
-        }
-
-
-        // =====================================================
-        // FASE 5
-        // =====================================================
-
-        if (
-            state.stage === 4
-        ) {
+            canyonSky.addColorStop(
+                1,
+                "#9b4e34"
+            );
 
             ctx.fillStyle =
-                "#171011";
-
+                canyonSky;
 
             ctx.fillRect(
-
                 0,
-
                 0,
-
                 width,
+                top
+            );
 
+
+            // Mesas ao fundo.
+            ctx.fillStyle =
+                "#81412e";
+
+            ctx.beginPath();
+            ctx.moveTo(left, top);
+            ctx.lineTo(left + 80, top * 0.56);
+            ctx.lineTo(left + 210, top * 0.56);
+            ctx.lineTo(left + 270, top);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(right - 300, top);
+            ctx.lineTo(right - 230, top * 0.48);
+            ctx.lineTo(right - 90, top * 0.48);
+            ctx.lineTo(right, top);
+            ctx.closePath();
+            ctx.fill();
+
+
+            // Parede lateral esquerda.
+            ctx.fillStyle =
+                "#633323";
+
+            ctx.fillRect(
+                0,
+                0,
+                left,
                 height
-
             );
 
-
-            ctx.fillStyle =
-                "#4e3228";
-
-
+            // Parede lateral direita.
             ctx.fillRect(
-
+                right,
                 0,
-
-                height * 0.42,
-
-                width,
-
-                height * 0.58
-
+                width - right,
+                height
             );
 
 
+            // Estratos nas paredes.
             ctx.fillStyle =
-                "#21191a";
-
+                "rgba(235, 150, 91, 0.13)";
 
             for (
-
-                let x = 35;
-
-                x < width;
-
-                x += 145
-
+                let y = 40;
+                y < height;
+                y += 62
             ) {
-
                 ctx.fillRect(
-
-                    x,
-
-                    height * 0.31,
-
-                    118,
-
-                    54
-
+                    0,
+                    y,
+                    left,
+                    3
                 );
 
-
-                ctx.fillStyle =
-                    "#8c5330";
-
-
                 ctx.fillRect(
-
-                    x + 16,
-
-                    height * 0.335,
-
-                    18,
-
-                    18
-
+                    right,
+                    y + 17,
+                    width - right,
+                    3
                 );
-
-
-                ctx.fillRect(
-
-                    x + 49,
-
-                    height * 0.335,
-
-                    18,
-
-                    18
-
-                );
-
-
-                ctx.fillStyle =
-                    "#21191a";
-
             }
 
 
-            ctx.fillStyle =
-                "#2b211d";
-
-
-            ctx.fillRect(
-
-                0,
-
-                height * 0.72,
-
-                width,
-
-                8
-
-            );
-
-
-            ctx.fillRect(
-
-                0,
-
-                height * 0.83,
-
-                width,
-
-                8
-
-            );
-
-
-            for (
-
-                let x = 0;
-
-                x < width;
-
-                x += 46
-
-            ) {
-
-                ctx.fillRect(
-
-                    x,
-
-                    height * 0.70,
-
-                    7,
-
-                    height * 0.16
-
+            // Piso do corredor jogável.
+            const sand =
+                ctx.createLinearGradient(
+                    0,
+                    top,
+                    0,
+                    height
                 );
 
+            sand.addColorStop(
+                0,
+                "#b9693b"
+            );
+
+            sand.addColorStop(
+                1,
+                "#d08645"
+            );
+
+            ctx.fillStyle =
+                sand;
+
+            ctx.fillRect(
+                left,
+                top,
+                right - left,
+                height - top
+            );
+
+
+            // Linhas de vento e rachaduras leves.
+            ctx.strokeStyle =
+                "rgba(105, 54, 34, 0.22)";
+
+            ctx.lineWidth =
+                2;
+
+            for (
+                let y = top + 55;
+                y < height;
+                y += 76
+            ) {
+                ctx.beginPath();
+                ctx.moveTo(left + 25, y);
+                ctx.lineTo(right - 25, y + 12);
+                ctx.stroke();
             }
+
+
+            // Bordas físicas visíveis.
+            ctx.fillStyle =
+                "rgba(38, 20, 15, 0.42)";
+
+            ctx.fillRect(
+                left - 5,
+                0,
+                10,
+                height
+            );
+
+            ctx.fillRect(
+                right - 5,
+                0,
+                10,
+                height
+            );
+
+            ctx.fillRect(
+                left,
+                top - 5,
+                right - left,
+                10
+            );
 
         }
 
+
+        // =====================================================
+        // FASE 5 — ÚLTIMO TREM
+        // =====================================================
+
+        else {
+
+            const night =
+                ctx.createLinearGradient(
+                    0,
+                    0,
+                    0,
+                    top
+                );
+
+            night.addColorStop(
+                0,
+                "#120d18"
+            );
+
+            night.addColorStop(
+                0.58,
+                "#231424"
+            );
+
+            night.addColorStop(
+                1,
+                "#351c29"
+            );
+
+            ctx.fillStyle =
+                night;
+
+            ctx.fillRect(
+                0,
+                0,
+                width,
+                top
+            );
+
+
+            // Lua.
+            ctx.fillStyle =
+                "rgba(236, 214, 174, 0.76)";
+
+            ctx.beginPath();
+            ctx.arc(
+                width * 0.18,
+                top * 0.24,
+                28,
+                0,
+                Math.PI * 2
+            );
+            ctx.fill();
+
+
+            // Silhueta de postes/torres.
+            ctx.fillStyle =
+                "#151116";
+
+            for (
+                let x = 40;
+                x < width;
+                x += 210
+            ) {
+                ctx.fillRect(
+                    x,
+                    top * 0.22,
+                    8,
+                    top * 0.78
+                );
+
+                ctx.fillRect(
+                    x - 22,
+                    top * 0.25,
+                    52,
+                    6
+                );
+            }
+
+
+            // Vagões ao fundo: funcionam visualmente como parede.
+            for (
+                let x = 24;
+                x < width;
+                x += 142
+            ) {
+
+                ctx.fillStyle =
+                    "#20171c";
+
+                ctx.fillRect(
+                    x,
+                    top * 0.57,
+                    108,
+                    top * 0.31
+                );
+
+                ctx.fillStyle =
+                    "#a75a36";
+
+                ctx.fillRect(
+                    x + 14,
+                    top * 0.66,
+                    18,
+                    18
+                );
+
+                ctx.fillRect(
+                    x + 48,
+                    top * 0.66,
+                    18,
+                    18
+                );
+
+                ctx.fillStyle =
+                    "rgba(217, 85, 111, 0.18)";
+
+                ctx.fillRect(
+                    x,
+                    top * 0.56,
+                    108,
+                    3
+                );
+
+            }
+
+
+            // Chão ferroviário jogável.
+            ctx.fillStyle =
+                "#54362f";
+
+            ctx.fillRect(
+                0,
+                top,
+                width,
+                height - top
+            );
+
+
+            // Trilhos.
+            ctx.fillStyle =
+                "#24191a";
+
+            ctx.fillRect(
+                0,
+                height * 0.75,
+                width,
+                8
+            );
+
+            ctx.fillRect(
+                0,
+                height * 0.87,
+                width,
+                8
+            );
+
+            for (
+                let x = 0;
+                x < width;
+                x += 48
+            ) {
+                ctx.fillRect(
+                    x,
+                    height * 0.73,
+                    7,
+                    height * 0.18
+                );
+            }
+
+
+            // Luz vermelha distante para dar clima de fase final.
+            const redGlow =
+                ctx.createRadialGradient(
+                    width * 0.82,
+                    top + 55,
+                    5,
+                    width * 0.82,
+                    top + 55,
+                    130
+                );
+
+            redGlow.addColorStop(
+                0,
+                "rgba(196, 52, 68, 0.18)"
+            );
+
+            redGlow.addColorStop(
+                1,
+                "rgba(196, 52, 68, 0)"
+            );
+
+            ctx.fillStyle =
+                redGlow;
+
+            ctx.fillRect(
+                width * 0.82 - 140,
+                top - 80,
+                280,
+                280
+            );
+
+
+            ctx.fillStyle =
+                "rgba(10, 7, 9, 0.52)";
+
+            ctx.fillRect(
+                0,
+                top - 5,
+                width,
+                10
+            );
+
+        }
+
+
+        // =====================================================
+        // VINHETA
+        // =====================================================
 
         const vignette =
-
             ctx.createRadialGradient(
-
                 width / 2,
-
                 height / 2,
-
                 Math.min(
                     width,
                     height
-                )
-                *
-                0.12,
-
+                ) * 0.15,
                 width / 2,
-
                 height / 2,
-
                 Math.max(
                     width,
                     height
-                )
-                *
-                0.72
-
+                ) * 0.74
             );
 
-
         vignette.addColorStop(
-
             0,
-
             "rgba(0,0,0,0)"
-
         );
-
 
         vignette.addColorStop(
-
             1,
-
-            "rgba(0,0,0,0.35)"
-
+            "rgba(0,0,0,0.28)"
         );
-
 
         ctx.fillStyle =
             vignette;
 
-
         ctx.fillRect(
-
             0,
-
             0,
-
             width,
-
             height
-
         );
 
     }
@@ -7014,6 +7593,202 @@
 
 
     // =========================================================
+    // MIRA ESTILIZADA DO MOUSE
+    // =========================================================
+
+    function drawGunSight() {
+
+        if (
+            !pointer.active
+        ) {
+
+            return;
+
+        }
+
+
+        const x =
+            pointer.x;
+
+        const y =
+            pointer.y;
+
+
+        ctx.save();
+
+
+        ctx.lineWidth =
+            2;
+
+        ctx.strokeStyle =
+            "rgba(255, 225, 170, 0.95)";
+
+        ctx.fillStyle =
+            "rgba(255, 235, 190, 0.95)";
+
+        ctx.shadowColor =
+            "rgba(255, 180, 80, 0.45)";
+
+        ctx.shadowBlur =
+            10;
+
+
+        // Arcos externos dão aparência de mira de arma.
+        ctx.beginPath();
+
+        ctx.arc(
+            x,
+            y,
+            16,
+            Math.PI * 0.18,
+            Math.PI * 0.82
+        );
+
+        ctx.stroke();
+
+
+        ctx.beginPath();
+
+        ctx.arc(
+            x,
+            y,
+            16,
+            Math.PI * 1.18,
+            Math.PI * 1.82
+        );
+
+        ctx.stroke();
+
+
+        // Círculo interno.
+        ctx.beginPath();
+
+        ctx.arc(
+            x,
+            y,
+            6,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.stroke();
+
+
+        // Linhas principais da mira.
+        ctx.beginPath();
+
+        ctx.moveTo(
+            x - 26,
+            y
+        );
+
+        ctx.lineTo(
+            x - 10,
+            y
+        );
+
+        ctx.moveTo(
+            x + 10,
+            y
+        );
+
+        ctx.lineTo(
+            x + 26,
+            y
+        );
+
+        ctx.moveTo(
+            x,
+            y - 26
+        );
+
+        ctx.lineTo(
+            x,
+            y - 10
+        );
+
+        ctx.moveTo(
+            x,
+            y + 10
+        );
+
+        ctx.lineTo(
+            x,
+            y + 26
+        );
+
+        ctx.stroke();
+
+
+        // Pequenos detalhes diagonais deixam a mira mais estilizada.
+        ctx.beginPath();
+
+        ctx.moveTo(
+            x - 14,
+            y - 14
+        );
+
+        ctx.lineTo(
+            x - 20,
+            y - 20
+        );
+
+        ctx.moveTo(
+            x + 14,
+            y - 14
+        );
+
+        ctx.lineTo(
+            x + 20,
+            y - 20
+        );
+
+        ctx.moveTo(
+            x - 14,
+            y + 14
+        );
+
+        ctx.lineTo(
+            x - 20,
+            y + 20
+        );
+
+        ctx.moveTo(
+            x + 14,
+            y + 14
+        );
+
+        ctx.lineTo(
+            x + 20,
+            y + 20
+        );
+
+        ctx.stroke();
+
+
+        // Ponto central.
+        ctx.shadowBlur =
+            0;
+
+        ctx.beginPath();
+
+        ctx.arc(
+            x,
+            y,
+            2.4,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+
+        ctx.restore();
+
+    }
+
+
+    // =========================================================
     // CRIAR PARTÍCULAS
     // =========================================================
 
@@ -7462,46 +8237,13 @@
 
     function clampPlayer() {
 
-        const margin =
-            player.radius + 8;
-
-
-        player.x =
-
-            Math.max(
-
-                margin,
-
-                Math.min(
-
-                    gameWidth()
-                    -
-                    margin,
-
-                    player.x
-
-                )
-
-            );
-
-
-        player.y =
-
-            Math.max(
-
-                margin,
-
-                Math.min(
-
-                    gameHeight()
-                    -
-                    margin,
-
-                    player.y
-
-                )
-
-            );
+        // O jogador agora respeita a área de chão de cada fase.
+        // Na fase 4 isso também cria as duas paredes laterais.
+        clampEntityToStage(
+            player,
+            state.stage,
+            8
+        );
 
     }
 
